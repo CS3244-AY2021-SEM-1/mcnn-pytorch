@@ -6,7 +6,7 @@ from models.mcnnpytorch.src.models import MCNN
 class CrowdCounter(nn.Module):
     def __init__(self):
         super(CrowdCounter, self).__init__()        
-        self.DME = MCNN()        
+        self.DME = MCNN() # This is for the MCNN model
         self.loss_fn = nn.MSELoss()
         
     @property
