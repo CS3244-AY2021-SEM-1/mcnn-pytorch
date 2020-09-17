@@ -1,6 +1,6 @@
 import torch.nn as nn
-import network
-from models import MCNN
+from models.mcnnpytorch.src import network
+from models.mcnnpytorch.src.models import MCNN
 
 
 class CrowdCounter(nn.Module):

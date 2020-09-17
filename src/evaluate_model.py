@@ -1,5 +1,5 @@
-from crowd_count import CrowdCounter
-import network
+from models.mcnnpytorch.src.crowd_count import CrowdCounter
+from models.mcnnpytorch.src import network
 import numpy as np
 
 
