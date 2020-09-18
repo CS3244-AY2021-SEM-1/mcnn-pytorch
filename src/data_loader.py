@@ -30,8 +30,15 @@ class ImageDataLoader():
             for fname in self.data_files:     
                 blob = {}
                 f = h5py.File(fname, "r")
-                blob['data']=f['image']
-                blob['gt_density']=f['density']
+
+                img = f['image'][()]
+                img = img.reshape((1,3,img.shape[0], img.shape[1]))
+                blob['data']=img
+                
+                den = f['density'][()]
+                den = den.reshape((1,1,den.shape[0],den.shape[1]))    
+                blob['gt_density']=den
+                
                 blob['fname'] = fname
                 self.blob_list[idx] = blob
 
