@@ -23,17 +23,17 @@ class ImageDataLoader():
             random.seed(2468)
         self.num_samples = len(self.data_files)
         self.blob_list = {}        
-        self.id_list = range(0,self.num_samples)
+        self.id_list = list(range(0,self.num_samples))
         if self.pre_load:
             print('Pre-loading the data. This may take a while...')
             idx = 0
             for fname in self.data_files:     
                 blob = {}
-                with h5py.File(fname, "r") as f:
-                    blob['data']=f['image']
-                    blob['gt_density']=f['density']
-                    blob['fname'] = fname
-                    self.blob_list[idx] = blob
+                f = h5py.File(fname, "r")
+                blob['data']=f['image']
+                blob['gt_density']=f['density']
+                blob['fname'] = fname
+                self.blob_list[idx] = blob
 
                 idx = idx+1
                 if idx % 100 == 0:                    
