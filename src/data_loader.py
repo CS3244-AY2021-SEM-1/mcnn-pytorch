@@ -58,11 +58,11 @@ class ImageDataLoader():
             else:                    
                 fname = files[idx]
                 blob = {}
-                with h5py.File(fname, "r") as f:
-                    blob['data']=f['image']
-                    blob['gt_density']=f['density']
-                    blob['fname'] = fname
-                    self.blob_list[idx] = blob
+                f = h5py.File(fname, "r")
+                blob['data']=f['image']
+                blob['gt_density']=f['density']
+                blob['fname'] = fname
+                self.blob_list[idx] = blob
                 
             yield blob
             
