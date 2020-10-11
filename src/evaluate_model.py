@@ -1,8 +1,7 @@
 import torch
-from models.csrnet_pytorch.src.crowd_count import CrowdCounter
-from models.csrnet_pytorch.src import network
+from model.csrnet_pytorch.src.crowd_count import CrowdCounter
+from model.csrnet_pytorch.src import network
 import numpy as np
-
 
 def evaluate_model(trained_model, data_loader, is_cuda=False):
     dtype = torch.FloatTensor if not is_cuda else torch.cuda.FloatTensor
