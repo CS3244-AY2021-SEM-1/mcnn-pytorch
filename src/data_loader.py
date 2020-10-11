@@ -6,7 +6,7 @@ import pandas as pd
 import h5py
 
 class ImageDataLoader():
-    def __init__(sself, data_path, shuffle=False, pre_load=False, num_pool=None):
+    def __init__(self, data_path, shuffle=False, pre_load=False, num_pool=None):
 
         self.data_path = data_path
         self.pre_load = pre_load
