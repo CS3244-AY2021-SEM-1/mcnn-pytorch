@@ -28,6 +28,11 @@ class ImageDataLoader():
                 f = h5py.File(fname, "r")
 
                 img = f['image'][()]
+                
+                # if BW, skip
+                if img_resized.shape == (target_shape[1], target_shape[0]): continue
+                if len(img_resized.shape) == 2: continue
+                    
                 blob['data'] = img.reshape((1, 3, img.shape[0], img.shape[1]))
 
                 den = f['density'][()]
@@ -72,7 +77,11 @@ class ImageDataLoader():
                 # resizing with cv2
                 img_resized = cv2.resize(img, target_shape, interpolation = cv2.INTER_CUBIC)
                 gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_CUBIC)
-
+                
+                # if BW, skip
+                if img_resized.shape == (target_shape[1], target_shape[0]): continue
+                if len(img_resized.shape) == 2: continue
+                    
                 blob['data'] = img_resized.reshape(1, 3, target_shape[0], target_shape[1])
                 blob['gt_density'] = gt_resized.reshape(1, 1, gt_target_shape[0], gt_target_shape[1])
 
