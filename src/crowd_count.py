@@ -1,24 +1,37 @@
 import torch.nn as nn
-from models.mcnnpytorch.src import network
-from models.mcnnpytorch.src.models import MCNN
+from model.mcnnpytorch.src import network
+from model.mcnnpytorch.src.model import MCNN
 
 
 class CrowdCounter(nn.Module):
-    def __init__(self):
+    def __init__(self, is_cuda=False):
         super(CrowdCounter, self).__init__()        
-        self.DME = MCNN()        
+        self.model = MCNN()
         self.loss_fn = nn.MSELoss()
+        self.is_cuda=is_cuda
         
     @property
     def loss(self):
         return self.loss_mse
     
     def forward(self, im_data, gt_data=None):        
-        im_data = network.np_to_variable(im_data, is_cuda=False, is_training=self.training)
-        density_map = self.DME(im_data)
+        im_data = network.np_to_variable(
+            im_data, 
+            is_cuda=self.is_cuda, 
+            is_training=self.training
+        )
+
+        density_map = self.model(im_data)
+#         print(f'Density map size: {density_map.shape}. Density map type: {density_map.dtype}')
+
         
         if self.training:                        
-            gt_data = network.np_to_variable(gt_data, is_cuda=False, is_training=self.training)
+            gt_data = network.np_to_variable(
+                gt_data, 
+                is_cuda=self.is_cuda, 
+                is_training=self.training
+            )
+#             print(f'Ground Truth Map Size: {gt_data.shape}. Ground truth map type: {gt_data.dtype}')
             self.loss_mse = self.build_loss(density_map, gt_data)
             
         return density_map
