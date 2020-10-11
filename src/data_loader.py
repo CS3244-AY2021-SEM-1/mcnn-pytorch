@@ -75,8 +75,8 @@ class ImageDataLoader():
                 gt_target_shape = (720//divide, 1280//divide)
 
                 # resizing with cv2
-                img_resized = cv2.resize(img, target_shape, interpolation = cv2.INTER_CUBIC)
-                gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_CUBIC)
+                img_resized = cv2.resize(img, target_shape, interpolation = cv2.INTER_CUBIC)*16
+                gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_CUBIC)*16
                 
                 # if BW, skip
                 if img_resized.shape == (target_shape[1], target_shape[0]): continue
