@@ -6,24 +6,20 @@ import pandas as pd
 import h5py
 
 class ImageDataLoader():
-    def __init__(self, data_path, gt_path, shuffle=False, pre_load=False):
-        """
-        pre_load: if true, all training and validation images are loaded into CPU RAM 
-        for faster processing. This avoids frequent file reads. Use this only for small datasets.
-        """
+    def __init__(sself, data_path, shuffle=False, pre_load=False, num_pool=None):
 
         self.data_path = data_path
-        self.gt_path = gt_path
         self.pre_load = pre_load
-        self.data_files = [os.path.join(data_path, filename) for filename in os.listdir(data_path)
-                           if os.path.isfile(os.path.join(data_path,filename))][0:3]
-        self.data_files.sort()
         self.shuffle = shuffle
-        if shuffle:
-            random.seed(2468)
+        self.num_pool = num_pool
+        if shuffle: random.seed(2468)
+
+        self.data_files = [os.path.join(data_path, filename) for filename in os.listdir(data_path)
+                           if os.path.isfile(os.path.join(data_path, filename))]
+
         self.num_samples = len(self.data_files)
-        self.blob_list = {}        
-        self.id_list = list(range(0,self.num_samples))
+        self.blob_list = {}
+        self.id_list = list(range(0, self.num_samples))
         if self.pre_load:
             print('Pre-loading the data. This may take a while...')
             idx = 0
@@ -32,14 +28,11 @@ class ImageDataLoader():
                 f = h5py.File(fname, "r")
 
                 img = f['image'][()]
-                img = img.reshape((1,3,img.shape[0], img.shape[1]))
-                blob['data']=img
-                
+                blob['data'] = img.reshape((1, 3, img.shape[0], img.shape[1]))
+
                 den = f['density'][()]
-                den = den.reshape((1,1,den.shape[0],den.shape[1]))    
-                blob['gt_density']=den
-                
-                blob['fname'] = fname
+                blob['gt_density'] = den.reshape((1, 1, den.shape[0], den.shape[1]))
+
                 self.blob_list[idx] = blob
 
                 idx = idx+1
@@ -57,7 +50,8 @@ class ImageDataLoader():
                 random.shuffle(self.data_files)
         files = self.data_files
         id_list = self.id_list
-       
+        num_pool = self.num_pool
+        
         for idx in id_list:
             if self.pre_load:
                 blob = self.blob_list[idx]    
@@ -66,9 +60,22 @@ class ImageDataLoader():
                 fname = files[idx]
                 blob = {}
                 f = h5py.File(fname, "r")
-                blob['data']=f['image']
-                blob['gt_density']=f['density']
-                blob['fname'] = fname
+                
+                img = f['image'][()]
+                den = f['density'][()]
+
+                # target shape
+                target_shape = (720, 1280)
+                divide = 2**num_pool
+                gt_target_shape = (720//divide, 1280//divide)
+
+                # resizing with cv2
+                img_resized = cv2.resize(img, target_shape, interpolation = cv2.INTER_CUBIC)
+                gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_CUBIC)
+
+                blob['data'] = img_resized.reshape(1, 3, target_shape[0], target_shape[1])
+                blob['gt_density'] = gt_resized.reshape(1, 1, gt_target_shape[0], gt_target_shape[1])
+
                 self.blob_list[idx] = blob
                 
             yield blob

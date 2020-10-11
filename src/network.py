@@ -34,21 +34,30 @@ class FC(nn.Module):
 
 
 def save_net(fname, net):
+    '''
+    Save the network parameters/weights
+    '''
     import h5py
     h5f = h5py.File(fname, mode='w')
     for k, v in net.state_dict().items():
         h5f.create_dataset(k, data=v.cpu().numpy())
 
 
-def load_net(fname, net):
+def load_net(fname, net, dtype=torch.FloatTensor):
+    '''
+    Load the network parameters/weights
+    '''
     import h5py
     h5f = h5py.File(fname, mode='r')
-    for k, v in net.state_dict().items():        
-        param = torch.from_numpy(np.asarray(h5f[k]))         
+    for k, v in net.state_dict().items():
+        param = torch.from_numpy(np.asarray(h5f[k])).type(dtype)
         v.copy_(param)
 
 
 def np_to_variable(x, is_cuda=True, is_training=False, dtype=torch.FloatTensor):
+    '''Converts the numpy matrix to a tensor before it gets fed into the NN
+    - Does preprocessing step is included here
+    '''
     if is_training:
         v = Variable(torch.as_tensor(x).type(dtype))
     else:
@@ -69,8 +78,7 @@ def weights_normal_init(model, dev=0.01):
             weights_normal_init(m, dev)
     else:
         for m in model.modules():
-            if isinstance(m, nn.Conv2d):                
-                #print torch.sum(m.weight)
+            if isinstance(m, nn.Conv2d):
                 m.weight.data.normal_(0.0, dev)
                 if m.bias is not None:
                     m.bias.data.fill_(0.0)
