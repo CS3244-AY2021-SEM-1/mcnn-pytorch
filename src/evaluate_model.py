@@ -1,6 +1,6 @@
 import torch
-from model.csrnet_pytorch.src.crowd_count import CrowdCounter
-from model.csrnet_pytorch.src import network
+from models.csrnet_pytorch.src.crowd_count import CrowdCounter
+from models.csrnet_pytorch.src import network
 import numpy as np
 
 def evaluate_model(trained_model, data_loader, is_cuda=False):
