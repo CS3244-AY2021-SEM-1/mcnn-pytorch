@@ -72,7 +72,7 @@ def set_trainable(model, requires_grad):
         param.requires_grad = requires_grad
 
 
-def weights_normal_init(model, dev=1):
+def weights_normal_init(model, dev=0.01):
     if isinstance(model, list):
         for m in model:
             weights_normal_init(m, dev)
