@@ -4,6 +4,7 @@ import os
 import random
 import pandas as pd
 import h5py
+import ast
 
 class ImageDataLoader():
     def __init__(self, data_path, shuffle=False, pre_load=False, num_pool=None):
