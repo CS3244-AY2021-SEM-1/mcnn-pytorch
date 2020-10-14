@@ -37,7 +37,7 @@ class ImageDataLoader():
                 if len(img_resized.shape) == 2: continue
 
                 blob['data'] = img.reshape((1, 3, img.shape[0], img.shape[1]))
-                blob['gt_density'] = den.reshape((1, 1, den.shape[0], den.shape[1])) #* (4**num_pool)
+                blob['gt_density'] = den.reshape((1, 1, den.shape[0], den.shape[1])) * (4**num_pool)
                 blob['metadata'] = ast.literal_eval(metadata)
                 
                 self.blob_list[idx] = blob
@@ -79,14 +79,14 @@ class ImageDataLoader():
 
                 # resizing with cv2
                 img_resized = cv2.resize(img, target_shape, interpolation = cv2.INTER_LINEAR)
-                gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_LINEAR) #* (4**num_pool)
+                gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_LINEAR) * (4**num_pool)
                 
                 # if BW, skip
                 if img_resized.shape == (target_shape[1], target_shape[0]): continue
                 if len(img_resized.shape) == 2: continue
 
                 blob['data'] = img_resized.reshape(1, 3, target_shape[0], target_shape[1])
-                blob['gt_density'] = gt_resized.reshape(1, 1, gt_target_shape[0], gt_target_shape[1]) #* (4**num_pool)
+                blob['gt_density'] = gt_resized.reshape(1, 1, gt_target_shape[0], gt_target_shape[1]) * (4**num_pool)
                 blob['metadata'] = ast.literal_eval(metadata)
 
                 self.blob_list[idx] = blob
@@ -112,10 +112,10 @@ class ImageDataLoader():
 
         # resizing with cv2
         img_resized = cv2.resize(img, target_shape, interpolation = cv2.INTER_CUBIC)
-        gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_CUBIC) #* (4**num_pool)
+        gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_CUBIC) * (4**num_pool)
 
         blob['data'] = img_resized.reshape(1, 3, target_shape[0], target_shape[1])
-        blob['gt_density'] = gt_resized.reshape(1, 1, gt_target_shape[0], gt_target_shape[1]) #* (4**num_pool)
+        blob['gt_density'] = gt_resized.reshape(1, 1, gt_target_shape[0], gt_target_shape[1]) * (4**num_pool)
         blob['metadata'] = ast.literal_eval(metadata)
         
         return blob
