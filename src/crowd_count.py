@@ -6,7 +6,7 @@ from models.mcnnpytorch.src.model import MCNN
 class CrowdCounter(nn.Module):
     def __init__(self, is_cuda=False):
         super(CrowdCounter, self).__init__()        
-        self.model = CSRNet()
+        self.model = MCNN()
         self.criterion = nn.SmoothL1Loss()
         self.is_cuda=is_cuda
         
