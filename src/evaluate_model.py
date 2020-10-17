@@ -23,30 +23,31 @@ def evaluate_model(trained_model, data_loader, is_cuda=False):
     crowddensity_count = {'High': 0, 'Med': 0, 'Low': 0}
     weather_count = {'None': 0, 'Fog': 0, 'Rain': 0, 'Snow': 0}
 
-    for blob in data_loader:                        
-        im_data = blob['data']
-        gt_data = blob['gt_density']
-        metadata = blob['metadata']
-        
-        crowd_density = metadata['crowd_density']
-        weather = metadata['weather']
-        
-        density_map = net(im_data, gt_data)
-        density_map = density_map.data.cpu().numpy()
-        gt_count = np.sum(gt_data)
-        et_count = np.sum(density_map)
-        
-        # updating the values
-        MAEcrowddensity[crowd_density] += abs(gt_count-et_count)
-        MSEcrowddensity[crowd_density] += ((gt_count-et_count)*(gt_count-et_count))
-        MAEweather[weather] += abs(gt_count-et_count)
-        MSEweather[weather] += ((gt_count-et_count)*(gt_count-et_count))
-        MAE += abs(gt_count-et_count)
-        MSE += ((gt_count-et_count)*(gt_count-et_count))
-        
-        # updating the counts
-        crowddensity_count[crowd_density] += 1
-        weather_count[weather] += 1
+    with torch.no_grad():
+        for blob in data_loader:                        
+            im_data = blob['data']
+            gt_data = blob['gt_density']
+            metadata = blob['metadata']
+            
+            crowd_density = metadata['crowd_density']
+            weather = metadata['weather']
+            
+            density_map = net(im_data, gt_data)
+            density_map = density_map.data.cpu().numpy()
+            gt_count = np.sum(gt_data)
+            et_count = np.sum(density_map)
+            
+            # updating the values
+            MAEcrowddensity[crowd_density] += abs(gt_count-et_count)
+            MSEcrowddensity[crowd_density] += ((gt_count-et_count)*(gt_count-et_count))
+            MAEweather[weather] += abs(gt_count-et_count)
+            MSEweather[weather] += ((gt_count-et_count)*(gt_count-et_count))
+            MAE += abs(gt_count-et_count)
+            MSE += ((gt_count-et_count)*(gt_count-et_count))
+            
+            # updating the counts
+            crowddensity_count[crowd_density] += 1
+            weather_count[weather] += 1
         
     # averaging
     for key in crowddensity_count:
@@ -62,5 +63,6 @@ def evaluate_model(trained_model, data_loader, is_cuda=False):
     # averaging
     MAE /= data_loader.get_num_samples()
     MSE /= data_loader.get_num_samples()
+    RMSE = np.sqrt(MSE)
     
-    return MAEcrowddensity, MSEcrowddensity, MAEweather, MSEweather, MAE, MSE
+    return MAEcrowddensity, MSEcrowddensity, MAEweather, MSEweather, MAE, MSE, RMSE
