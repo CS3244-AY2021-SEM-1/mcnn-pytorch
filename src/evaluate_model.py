@@ -3,6 +3,24 @@ from models.mcnnpytorch.src.crowd_count import CrowdCounter
 from models.mcnnpytorch.src import network
 import numpy as np
 
+def AnalyseLoader(loader, title='Breakdown of the images in the loader by type'):
+    d = {'High': 0, 'Med': 0, 'Low': 0, 'None': 0, 'Fog': 0, 'Rain': 0, 'Snow': 0}
+    colours = ['orange', 'orange', 'orange', 'green', 'green', 'green', 'green']
+    labels = ['crowd', 'weather', 'weather', 'weather', 'weather', 'weather', 'weather']
+    for id, blob in enumerate(loader):
+        metadata = blob['metadata']
+        d[metadata['crowd_density']] += 1
+        d[metadata['weather']] += 1
+    for i, key in enumerate(d):
+        plt.text(i, d[key], '{}%'.format(d[key]*100/loader.get_num_samples()), 
+                 ha='center', va='bottom', size=10)
+    pd.Series(d).plot(kind='bar', figsize=(8,5), color=colours)
+    leg1 = mpatches.Patch(color='orange', label='Crowd Density')
+    leg2 = mpatches.Patch(color='green', label='Weather')
+    plt.legend(handles=[leg1, leg2])
+    plt.title(title)
+    plt.show()
+    
 def evaluate_model(trained_model, data_loader, is_cuda=False):
     dtype = torch.FloatTensor if not is_cuda else torch.cuda.FloatTensor
     net = CrowdCounter(is_cuda=is_cuda)
