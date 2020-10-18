@@ -23,7 +23,7 @@ class CrowdCounter(nn.Module):
 
         # generating density map + upsampling to match the gt_data shape
         density_map = self.model(im_data)
-        density_map = nn.functional.interpolate(density_map, (gt_data.shape[2], gt_data.shape[3]), mode='bilinear', align_corners=True)
+        #density_map = nn.functional.interpolate(density_map, (gt_data.shape[2], gt_data.shape[3]), mode='bilinear', align_corners=True)
 
         
         if self.training:                        
@@ -32,6 +32,7 @@ class CrowdCounter(nn.Module):
                 is_cuda=self.is_cuda, 
                 is_training=self.training
             )
+            gt_data = nn.functional.interpolate(gt_data, (density_map.shape[2], density_map.shape[3]), mode='bilinear', align_corners=True)
             self.loss_value = self.build_loss(density_map, gt_data)
             
         return density_map
