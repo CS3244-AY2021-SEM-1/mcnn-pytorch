@@ -20,7 +20,7 @@ import h5py
 import ast
 
 class ImageDataLoader():
-    def init(self, data_path, shuffle=False, pre_load=False, size=0):
+    def __init__(self, data_path, shuffle=False, pre_load=False, size=0):
 
         self.data_path = data_path
         self.pre_load = pre_load
@@ -60,7 +60,7 @@ class ImageDataLoader():
 
             print(f'Completed Loading {idx} files')
 
-    def iter(self):
+    def __iter__(self):
         if self.shuffle:
             if self.pre_load:
                 random.shuffle(self.id_list)
