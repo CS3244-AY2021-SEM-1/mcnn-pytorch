@@ -32,7 +32,7 @@ class CrowdCounter(nn.Module):
                 is_cuda=self.is_cuda, 
                 is_training=self.training
             )
-            gt_data = nn.functional.interpolate(gt_data, (density_map.shape[2], density_map.shape[3]), mode='bilinear', align_corners=True)
+            gt_data = nn.functional.interpolate(gt_data, (density_map.shape[2], density_map.shape[3]), mode='bilinear', align_corners=True) * 16
             self.loss_value = self.build_loss(density_map, gt_data)
             
         return density_map
