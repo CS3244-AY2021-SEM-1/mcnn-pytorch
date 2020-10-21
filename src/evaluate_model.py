@@ -28,19 +28,22 @@ def evaluate_model(trained_model, data_loader, is_cuda=False):
     if is_cuda:
         net.cuda()
     net.eval()
-    
+
     # values
     MAEcrowddensity = {'High': 0, 'Med': 0, 'Low': 0}
     MSEcrowddensity = {'High': 0, 'Med': 0, 'Low': 0}
+    MAPEcrowddensity = {'High': 0, 'Med': 0, 'Low': 0}
     MAEweather = {'None': 0, 'Fog': 0, 'Rain': 0, 'Snow': 0}
     MSEweather = {'None': 0, 'Fog': 0, 'Rain': 0, 'Snow': 0}
+    MAPEweather = {'None': 0, 'Fog': 0, 'Rain': 0, 'Snow': 0}
     MAE = 0.0
     MSE = 0.0
+    MAPE = 0.0
     
     # counts for averaging
     crowddensity_count = {'High': 0, 'Med': 0, 'Low': 0}
     weather_count = {'None': 0, 'Fog': 0, 'Rain': 0, 'Snow': 0}
-
+    
     with torch.no_grad():
         for blob in data_loader:                        
             im_data = blob['data']
@@ -58,10 +61,15 @@ def evaluate_model(trained_model, data_loader, is_cuda=False):
             # updating the values
             MAEcrowddensity[crowd_density] += abs(gt_count-et_count)
             MSEcrowddensity[crowd_density] += ((gt_count-et_count)*(gt_count-et_count))
+            MAPEcrowddensity[crowd_density] += abs((gt_count-et_count)/gt_count)
+            
             MAEweather[weather] += abs(gt_count-et_count)
             MSEweather[weather] += ((gt_count-et_count)*(gt_count-et_count))
+            MAPEweather[weather] += abs((gt_count-et_count)/gt_count)
+            
             MAE += abs(gt_count-et_count)
             MSE += ((gt_count-et_count)*(gt_count-et_count))
+            MAPE += abs((gt_count-et_count)/gt_count)
             
             # updating the counts
             crowddensity_count[crowd_density] += 1
@@ -71,16 +79,18 @@ def evaluate_model(trained_model, data_loader, is_cuda=False):
     for key in crowddensity_count:
         MAEcrowddensity[key] = MAEcrowddensity[key] / crowddensity_count[key] if crowddensity_count[key] else 0
         MSEcrowddensity[key] = MSEcrowddensity[key] / crowddensity_count[key] if crowddensity_count[key] else 0
+        MAPEcrowddensity[key] = MAPEcrowddensity[key] / crowddensity_count[key] if crowddensity_count[key] else 0
     
     # averaging
     for key in weather_count:
-        if weather_count[key] != 0:
-            MAEweather[key] /= weather_count[key]
-            MSEweather[key] /= weather_count[key]
+        MAEweather[key] = MAEweather[key] / weather_count[key] if weather_count[key] else 0
+        MSEweather[key] = MSEweather[key] / weather_count[key] if weather_count[key] else 0
+        MAPEweather[key] = MAPEweather[key] / weather_count[key] if weather_count[key] else 0
     
     # averaging
     MAE /= data_loader.get_num_samples()
     MSE /= data_loader.get_num_samples()
+    MAPE /= data_loader.get_num_samples()
     RMSE = np.sqrt(MSE)
     
-    return MAEcrowddensity, MSEcrowddensity, MAEweather, MSEweather, MAE, MSE, RMSE
+    return MAEcrowddensity, MSEcrowddensity, MAPEcrowddensity, MAEweather, MSEweather, MAPEweather, MAE, MSE, RMSE, MAPE
