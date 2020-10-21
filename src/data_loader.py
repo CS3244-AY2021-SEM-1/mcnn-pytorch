@@ -104,13 +104,6 @@ class ImageDataLoader():
         img = f['image'][()]
         den = f['density'][()]
         metadata = f['metadata'][()]
-
-        # target shape
-        # target_shape = (720, 1280)
-        
-        #gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_CUBIC)
-        #if BW, skip
-        #if len(img.shape) == 2: continue
                 
         blob['data'] = img.reshape(1, 3, img.shape[0], img.shape[1])
         blob['gt_density'] = den.reshape(1, 1, den.shape[0], den.shape[1])
