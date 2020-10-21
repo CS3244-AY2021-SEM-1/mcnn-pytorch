@@ -95,3 +95,24 @@ class ImageDataLoader():
 
     def get_num_samples(self):
         return self.num_samples
+    
+    def get_test_input(self, num_pool=2, index=0):
+        fname = self.data_files[index]
+        blob = {}
+        f = h5py.File(fname, "r")
+
+        img = f['image'][()]
+        den = f['density'][()]
+        metadata = f['metadata'][()]
+
+        # target shape
+        target_shape = (720, 1280)
+        
+        gt_resized = cv2.resize(den, gt_target_shape, interpolation = cv2.INTER_CUBIC)
+
+        blob['data'] = img_resized.reshape(1, 3, target_shape[0], target_shape[1])
+        blob['gt_density'] = gt_resized.reshape(1, 1, gt_target_shape[0], gt_target_shape[1])
+        blob['gt_density'] = gt_resized.reshape(1, 1, gt_target_shape[0], gt_target_shape[1]) * (4**num_pool)
+        blob['metadata'] = ast.literal_eval(metadata)
+
+        return blob
