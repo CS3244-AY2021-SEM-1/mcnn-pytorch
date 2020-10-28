@@ -7,7 +7,8 @@ class CrowdCounter(nn.Module):
     def __init__(self, is_cuda=False):
         super(CrowdCounter, self).__init__()        
         self.model = MCNN()
-        self.criterion = nn.SmoothL1Loss()
+        #self.criterion = nn.SmoothL1Loss()
+        self.criterion = nn.MSELoss(size_average=False)
         self.is_cuda=is_cuda
         
     @property
