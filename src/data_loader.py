@@ -80,15 +80,17 @@ class ImageDataLoader():
                 fname = files[idx]
                 blob = {}
                 f = h5py.File(fname, "r")
-
+                
+                # if BW, skip
+                if len(img.shape) == 2: continue
+                    
 #                 img = f['image'][()]
 #                 den = f['density'][()]
                 img = torch.as_tensor(f['image'][()]).permute(2,0,1).unsqueeze(0)
                 den = torch.as_tensor(f['density'][()]).unsqueeze(0).unsqueeze(0)
                 metadata = f['metadata'][()]
 
-                # if BW, skip
-                if len(img.shape) == 2: continue
+                
 
                 blob['data'] = img
                 blob['gt_density'] = den
