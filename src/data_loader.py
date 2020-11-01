@@ -62,7 +62,7 @@ class ImageDataLoader():
 
             print(f'Completed Loading {idx} files')
 
-    def iter(self):
+    def __iter__(self):
         if self.shuffle:
             if self.pre_load:
                 random.shuffle(self.id_list)
