@@ -1,3 +1,4 @@
+  
 '''
 Contains the ImageDataLoader class
 - ImageDataLoader returns an iterable object
@@ -21,7 +22,7 @@ import ast
 import torch
 
 class ImageDataLoader():
-    def __init__(self, data_path, shuffle=False, pre_load=False, size=0):
+    def init(self, data_path, shuffle=False, pre_load=False, size=0):
 
         self.data_path = data_path
         self.pre_load = pre_load
@@ -42,15 +43,13 @@ class ImageDataLoader():
                 blob = {}
                 f = h5py.File(fname, "r")
 
-                #img = f['image'][()]
-                #den = f['density'][()]
                 img = torch.as_tensor(f['image'][()]).permute(2,0,1).unsqueeze(0)
                 den = torch.as_tensor(f['density'][()]).unsqueeze(0).unsqueeze(0)
                 metadata = f['metadata'][()]
-                
+
                 # if BW, skip
-                if len(img.shape) == 2: continue 
-                
+                if len(img.shape) == 2: continue
+
                 blob['data'] = img
                 blob['gt_density'] = den
                 blob['metadata'] = ast.literal_eval(metadata)
@@ -63,7 +62,7 @@ class ImageDataLoader():
 
             print(f'Completed Loading {idx} files')
 
-    def __iter__(self):
+    def iter(self):
         if self.shuffle:
             if self.pre_load:
                 random.shuffle(self.id_list)
@@ -80,19 +79,15 @@ class ImageDataLoader():
                 fname = files[idx]
                 blob = {}
                 f = h5py.File(fname, "r")
-                
-                    
-#                 img = f['image'][()]
-#                 den = f['density'][()]
-                img = torch.as_tensor(f['image'][()])
-                if len(img.shape) == 2: 
-                    continue
-                else:
-                    img = img.permute(2,0,1).unsqueeze(0)
-                den = torch.as_tensor(f['density'][()]).unsqueeze(0).unsqueeze(0)
-                metadata = f['metadata'][()]
 
-                
+                try:
+                    img = torch.as_tensor(f['image'][()]).permute(2,0,1).unsqueeze(0)
+                    den = torch.as_tensor(f['density'][()]).unsqueeze(0).unsqueeze(0)
+                    metadata = f['metadata'][()]
+                except:
+                    continue
+                # if BW, skip
+                if len(img.shape) == 2: continue
 
                 blob['data'] = img
                 blob['gt_density'] = den
@@ -110,12 +105,10 @@ class ImageDataLoader():
         blob = {}
         f = h5py.File(fname, "r")
 
-#         img = f['image'][()]
-#         den = f['density'][()]
         img = torch.as_tensor(f['image'][()]).permute(2,0,1).unsqueeze(0)
         den = torch.as_tensor(f['density'][()]).unsqueeze(0).unsqueeze(0)
         metadata = f['metadata'][()]
-                
+                    
         blob['data'] = img
         blob['gt_density'] = den
         blob['metadata'] = ast.literal_eval(metadata)

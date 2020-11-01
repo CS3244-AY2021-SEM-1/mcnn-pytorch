@@ -20,8 +20,8 @@ def save_results(input_img, gt_data, density_map, output_dir, fname='results.png
 def save_density_map(density_map,output_dir, fname='results.png'):    
     density_map = 255 * density_map / np.max(density_map)
     density_map= density_map[0][0]
-    cv2.imwrite(os.path.join(output_dir,fname),density_map)
-    
+    result = cv2.imwrite(os.path.join(output_dir,fname),density_map)
+    return result
     
 def display_results(input_img, gt_data,density_map):
     input_img = input_img[0][0]
